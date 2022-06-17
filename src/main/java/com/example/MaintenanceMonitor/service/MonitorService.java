@@ -11,9 +11,13 @@ public class MonitorService {
     @Autowired
     private Monitor monitor;
 
-    public Monitor resetMonitor () {
-        monitor.setMessage("");
-        monitor.setStatus(true);
+    public Monitor setMonitor (boolean state, String message) {
+        if (message == null) {
+            monitor.setMessage("-");
+        } else {
+            monitor.setMessage(message);
+        }
+        monitor.setStatus(state);
         monitor.setTimestamp(new LocalDateTime());
         return monitor;
     }
