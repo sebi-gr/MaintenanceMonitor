@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class MonitorService {
 
-    @Autowired
     private Monitor monitor;
+
+    @Autowired
+    public MonitorService(Monitor monitor) {
+        this.monitor = monitor;
+    }
 
     public Monitor setMonitor (boolean state, String message) {
         if (message == null) {

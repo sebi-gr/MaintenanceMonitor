@@ -23,13 +23,15 @@ public class MonitorControllerTests {
     private MonitorController monitorController;
 
     @Mock
-    private MonitorService monitorService;
+    private MonitorService monitorServiceMock;
 
     private Monitor monitor;
+    private MonitorService monitorService;
 
     @BeforeEach
     private void setUp () {
         this.monitor = new Monitor();
+        monitorService = new MonitorService(this.monitor);
     }
 
 
@@ -40,57 +42,70 @@ public class MonitorControllerTests {
     }
 
     @Test
-    public void testSetMessage() {
-        monitor.setMessage("Test");
-        assertThat(monitor.getMessage()).isEqualTo("Test");
-    }
-
-    @Test
     public void testOriginStatus() {
         assertTrue(monitor.isStatus());
+        assertThat(monitor.getMessage()).isEqualTo("-");
     }
 
     @Test
-    public void testSetStatus() {
-        monitor.setStatus(false);
+    public void testSetMonitor () {
+        monitorService.setMonitor(false, "down");
+        assertThat(monitor.getMessage()).isEqualTo("down");
         assertFalse(monitor.isStatus());
+        assertThat(monitor.getTimestamp()).isLessThanOrEqualTo(new LocalDateTime());
+    }
+
+    @Test
+    public void testSetMonitor_null () {
+        monitorService.setMonitor(false, null);
+        assertThat(monitor.getMessage()).isEqualTo("-");
+        assertFalse(monitor.isStatus());
+        assertThat(monitor.getTimestamp()).isLessThanOrEqualTo(new LocalDateTime());
+    }
+    
+    @Test
+    public void testGetMonitorData () {
+        monitorService.getMonitorData();
+        assertThat(monitor.getMessage()).isEqualTo("-");
+        assertTrue(monitor.isStatus());
+        assertThat(monitor.getTimestamp()).isLessThanOrEqualTo(new LocalDateTime());
     }
 
     //--------------INTEGRATION TESTS---------------
     @Test
     public void testResetEndpoint_downtime () {
-        Mockito.when(monitorService.setMonitor(Mockito.anyBoolean(), Mockito.anyString())).thenReturn(new Monitor(false, "No Connection", new LocalDateTime(2022, 6,17, 12, 0)));
+        Mockito.when(monitorServiceMock.setMonitor(Mockito.anyBoolean(), Mockito.anyString())).thenReturn(new Monitor(false, "No Connection", new LocalDateTime(2022, 6,17, 12, 0)));
 
         ResponseEntity<Monitor> responseEntity = monitorController.setMonitor(false, "No Connection");
 
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertFalse(responseEntity.getBody().isStatus());
         assertThat(responseEntity.getBody().getMessage()).isEqualTo("No Connection");
-        assertThat(responseEntity.getBody().getTimestamp()).isEqualTo(new LocalDateTime(2022, 6,17, 12, 0));
+        assertThat(responseEntity.getBody().getTimestamp()).isLessThanOrEqualTo(new LocalDateTime(2022, 6,17, 12, 0));
     }
 
     @Test
     public void testResetEndpoint_uptime () {
-        Mockito.when(monitorService.setMonitor(Mockito.anyBoolean(), Mockito.anyString())).thenReturn(new Monitor(true, "-", new LocalDateTime(2022, 6,17, 12, 0)));
+        Mockito.when(monitorServiceMock.setMonitor(Mockito.anyBoolean(), Mockito.anyString())).thenReturn(new Monitor(true, "-", new LocalDateTime(2022, 6,17, 12, 0)));
 
         ResponseEntity<Monitor> responseEntity = monitorController.setMonitor(true, "");
 
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertTrue(responseEntity.getBody().isStatus());
         assertThat(responseEntity.getBody().getMessage()).isEqualTo("-");
-        assertThat(responseEntity.getBody().getTimestamp()).isEqualTo(new LocalDateTime(2022, 6,17, 12, 0));
+        assertThat(responseEntity.getBody().getTimestamp()).isLessThanOrEqualTo(new LocalDateTime(2022, 6,17, 12, 0));
     }
 
     @Test
     public void testGetMessagesEndpoint () {
-        Mockito.when(monitorService.getMonitorData()).thenReturn(new Monitor(true, "-", new LocalDateTime(2022, 6,17, 12, 0)));
+        Mockito.when(monitorServiceMock.getMonitorData()).thenReturn(new Monitor(true, "-", new LocalDateTime(2022, 6,17, 12, 0)));
 
         ResponseEntity<Monitor> responseEntity = monitorController.getMessages();
 
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertTrue(responseEntity.getBody().isStatus());
         assertThat(responseEntity.getBody().getMessage()).isEqualTo("-");
-        assertThat(responseEntity.getBody().getTimestamp()).isEqualTo(new LocalDateTime(2022, 6,17, 12, 0));
+        assertThat(responseEntity.getBody().getTimestamp()).isLessThanOrEqualTo(new LocalDateTime(2022, 6,17, 12, 0));
     }
 
 }
