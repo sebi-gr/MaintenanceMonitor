@@ -14,6 +14,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class Monitor {
     boolean status = true;
-    String message;
+    String message = "-";
     LocalDateTime timestamp;
 }
