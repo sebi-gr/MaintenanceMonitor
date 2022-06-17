@@ -2,6 +2,7 @@ package com.example.MaintenanceMonitor.controller;
 
 import com.example.MaintenanceMonitor.resource.Monitor;
 import com.example.MaintenanceMonitor.service.MonitorService;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,5 +25,10 @@ public class MonitorController {
     public ResponseEntity<Monitor> resetMonitor() {
         Monitor resp = monitorService.resetMonitor();
         return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Monitor> getMessages() {
+        return new ResponseEntity<>(monitorService.getMonitorData(), HttpStatus.OK);
     }
 }
