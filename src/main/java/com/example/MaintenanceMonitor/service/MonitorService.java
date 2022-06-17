@@ -17,4 +17,9 @@ public class MonitorService {
         monitor.setTimestamp(new LocalDateTime());
         return monitor;
     }
+
+    public Monitor getMonitorData () {
+        monitor.setTimestamp(new LocalDateTime());
+        return monitor;
+    }
 }

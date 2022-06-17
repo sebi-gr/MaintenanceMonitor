@@ -58,7 +58,7 @@ public class MonitorControllerTests {
 
     //--------------INTEGRATION TESTS---------------
     @Test
-    public void testResetEndpoint () throws Exception {
+    public void testResetEndpoint () {
         Mockito.when(monitorService.resetMonitor()).thenReturn(new Monitor(true, "", new LocalDateTime(2022, 6,17, 12, 0)));
 
         ResponseEntity<Monitor> responseEntity = monitorController.resetMonitor();
@@ -66,6 +66,18 @@ public class MonitorControllerTests {
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertTrue(responseEntity.getBody().isStatus());
         assertThat(responseEntity.getBody().getMessage()).isEqualTo("");
+        assertThat(responseEntity.getBody().getTimestamp()).isEqualTo(new LocalDateTime(2022, 6,17, 12, 0));
+    }
+
+    @Test
+    public void testGetMessagesEndpoint () {
+        Mockito.when(monitorService.getMonitorData()).thenReturn(new Monitor(true, null, new LocalDateTime(2022, 6,17, 12, 0)));
+
+        ResponseEntity<Monitor> responseEntity = monitorController.getMessages();
+
+        assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
+        assertTrue(responseEntity.getBody().isStatus());
+        assertThat(responseEntity.getBody().getMessage()).isEqualTo(null);
         assertThat(responseEntity.getBody().getTimestamp()).isEqualTo(new LocalDateTime(2022, 6,17, 12, 0));
     }
 
