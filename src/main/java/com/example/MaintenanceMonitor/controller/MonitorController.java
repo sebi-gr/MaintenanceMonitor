@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @CrossOrigin
 @RestController
 @RequestMapping(path = "api/maintenanceMode")
@@ -17,8 +19,8 @@ public class MonitorController {
     MonitorService monitorService;
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Monitor> setMonitor(@RequestParam boolean state, @RequestParam(required = false) String message) {
-        Monitor resp = monitorService.setMonitor(state, message);
+    public ResponseEntity<Monitor> setMonitor(@RequestParam boolean state, @RequestParam Optional<String> message) {
+        Monitor resp = monitorService.setMonitor(state, message.orElse("-"));
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
