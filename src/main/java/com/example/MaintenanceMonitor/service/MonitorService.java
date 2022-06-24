@@ -5,6 +5,8 @@ import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class MonitorService {
 
@@ -16,11 +18,8 @@ public class MonitorService {
     }
 
     public Monitor setMonitor (boolean state, String message) {
-        if (message == null) {
-            monitor.setMessage("-");
-        } else {
-            monitor.setMessage(message);
-        }
+        Optional.ofNullable(message).orElseThrow(NullPointerException::new);
+        monitor.setMessage(message);
         monitor.setStatus(state);
         monitor.setTimestamp(new LocalDateTime());
         return monitor;

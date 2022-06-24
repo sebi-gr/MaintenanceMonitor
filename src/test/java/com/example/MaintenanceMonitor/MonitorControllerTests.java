@@ -4,6 +4,7 @@ import com.example.MaintenanceMonitor.controller.MonitorController;
 import com.example.MaintenanceMonitor.resource.Monitor;
 import com.example.MaintenanceMonitor.service.MonitorService;
 import org.joda.time.LocalDateTime;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -11,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -56,11 +59,10 @@ public class MonitorControllerTests {
     }
 
     @Test
-    public void testSetMonitor_null () {
-        monitorService.setMonitor(false, null);
-        assertThat(monitor.getMessage()).isEqualTo("-");
-        assertFalse(monitor.isStatus());
-        assertThat(monitor.getTimestamp()).isLessThanOrEqualTo(new LocalDateTime());
+    public void testSetMonitor_empty () {
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            monitorService.setMonitor(false, null);
+        });
     }
     
     @Test
@@ -76,7 +78,7 @@ public class MonitorControllerTests {
     public void testResetEndpoint_downtime () {
         Mockito.when(monitorServiceMock.setMonitor(Mockito.anyBoolean(), Mockito.anyString())).thenReturn(new Monitor(false, "No Connection", new LocalDateTime(2022, 6,17, 12, 0)));
 
-        ResponseEntity<Monitor> responseEntity = monitorController.setMonitor(false, "No Connection");
+        ResponseEntity<Monitor> responseEntity = monitorController.setMonitor(false, Optional.of("No Connection"));
 
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertFalse(responseEntity.getBody().isStatus());
@@ -88,7 +90,7 @@ public class MonitorControllerTests {
     public void testResetEndpoint_uptime () {
         Mockito.when(monitorServiceMock.setMonitor(Mockito.anyBoolean(), Mockito.anyString())).thenReturn(new Monitor(true, "-", new LocalDateTime(2022, 6,17, 12, 0)));
 
-        ResponseEntity<Monitor> responseEntity = monitorController.setMonitor(true, "");
+        ResponseEntity<Monitor> responseEntity = monitorController.setMonitor(true, Optional.empty());
 
         assertThat(responseEntity.getStatusCodeValue()).isEqualTo(200);
         assertTrue(responseEntity.getBody().isStatus());
